@@ -104,18 +104,26 @@
       pointer-events: none;
     }
 
-    /* Header & Navigation Styling */
+   /* Header & Navigation Styling */
     header {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      gap: 1rem;
       position: relative;
       z-index: 30;
-      padding: 1.5rem 2rem;
+      padding: 1.2rem 1rem;
       max-width: 90rem;
       margin: 0 auto;
       width: 100%;
-      gap: 1rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 75rem;
     }
 
     .nav-logo {
@@ -130,20 +138,29 @@
       display: block;
     }
 
+    /* Гадаад, дотоод аялал, season, contact нэг мөрөнд байх хэсэг */
     .nav-links {
       display: flex;
-      gap: 1.5rem;
+      gap: 1.2rem;
       list-style: none;
       text-transform: uppercase;
-      font-size: 0.8rem;
-      font-weight: 500;
-      white-space: nowrap; /* Үгс доошоо хуваагдаж унахгүй, нэг мөрөнд байх зориулалттай */
+      font-size: 0.75rem;
+      font-weight: 600;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 0.2rem 0;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none; /* Scrollbar-ийг нуух */
     }
 
     .nav-links a {
       color: var(--foreground);
       text-decoration: none;
-      transition: color 150ms cubic-bezier(0.2, 0, 0, 1);
+      transition: color 150ms ease;
     }
 
     .nav-links a:hover {
@@ -155,8 +172,8 @@
       text-decoration: none;
       font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.8rem;
-      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      padding: 0.4rem 1rem;
       border: 1px solid var(--border-muted);
       border-radius: 0.5rem;
       transition: all 150ms ease;

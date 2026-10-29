@@ -104,7 +104,7 @@
       pointer-events: none;
     }
 
-  /* Header & Navigation Default (Компьютер / Лаптоп дээр харагдах хэлбэр) */
+    /* Header & Navigation Default (Компьютер / Лаптоп дээр харагдах хэлбэр) */
     header {
       display: flex;
       align-items: center;
@@ -123,7 +123,7 @@
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: #090a0b; /* Тод хар өнгө */
+      color: #090a0b;
       text-decoration: none;
     }
 
@@ -170,6 +170,11 @@
       border-color: var(--foreground);
     }
 
+    /* Лаптоп footer-ийг утсан дээр нуух */
+    .hero-footer-mobile {
+      display: none;
+    }
+
     /* 📱 ГАР УТАС ДЭЭР ХАРАГДАХ ТУСГАЙ ТОХИРГОО (Дэлгэцийн өргөн 768px-ээс бага үед) */
     @media (max-width: 768px) {
       header {
@@ -184,10 +189,6 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-      }
-
-      .nav-logo img {
-        height: 2.1rem;
       }
 
       .nav-links {
@@ -205,6 +206,24 @@
       .booking-btn {
         font-size: 0.75rem;
         padding: 0.4rem 0.8rem;
+      }
+
+      /* Картыг сошиал хаягаас холдуулж зай гаргах */
+      .hero-content {
+        padding-bottom: 5rem !important;
+      }
+
+      /* Лаптоп доод хэсгийг нууж, гар утасныхыг ил гаргах */
+      .hero-desktop-footer {
+        display: none !important;
+      }
+      .hero-footer-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+        margin-top: 3rem;
+        padding-bottom: 2rem;
       }
     }
 
@@ -235,7 +254,6 @@
       line-height: 0.95;
     }
 
-    /* Highlight Featured Card on Right - Доошлуулахын тулд margin-top нэмнэ */
     .hero-right-card {
       background: rgba(18, 28, 23, 0.88);
       backdrop-filter: blur(12px);
@@ -251,7 +269,7 @@
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
       cursor: pointer;
-      margin-top: 4rem; /* Энэ мөрийг нэмж өгснөөр карт доошилно */
+      margin-top: 4rem;
     }
 
     .hero-right-card:hover {
@@ -260,7 +278,6 @@
       box-shadow: 0 30px 60px rgba(2, 210, 227, 0.3);
     }
 
-    /* Expedition Cards Hover Effects */
     .expedition-card {
       background: var(--surface-dark-raised);
       border: 1px solid var(--border-on-dark);
@@ -277,7 +294,6 @@
       box-shadow: 0 10px 30px rgba(2, 210, 227, 0.1);
     }
 
-    /* Upcoming Tours Card Styling */
     .tour-card {
       background: #121c17;
       border: 1px solid #1e2922;
@@ -311,7 +327,6 @@
       width: max-content;
     }
 
-    /* Footer Card Styling */
     .footer-card {
       background: #121c17;
       border: 1px solid #1e2922;
@@ -436,7 +451,6 @@
     <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
     <header>
-      <!-- Зүүн дээд талд текстэн лого байрлуулах хэсэг -->
       <a href="#" class="nav-logo">Unbound Traverse</a>
       
       <ul class="nav-links">
@@ -453,19 +467,16 @@
     
    <div class="hero-content">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 3rem; flex-wrap: wrap;">
-        <!-- Зүүн талын гарчиг болон мэдээлэл -->
-        <!-- Өөрчлөгдсөн HTML хэсэг -->
         <div style="flex: 1; min-width: 280px; max-width: 38rem; margin-top: 4rem;">
-  <h1 style="margin-bottom: 1.5rem; color: #090a0b;">
-    Unbound<br>Traverse
-  </h1>
-  <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 1.125rem; text-transform: uppercase; font-weight: 600; color: #1e293b;">
-    <div style="display: flex; align-items: center; gap: 0.5rem;">📍 Ulaanbaatar, Mongolia</div>
-    <div style="display: flex; align-items: center; gap: 0.5rem;">✦ International & Domestic Expeditions</div>
-  </div>
+          <h1 style="margin-bottom: 1.5rem; color: #090a0b;">
+            Unbound<br>Traverse
+          </h1>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 1.125rem; text-transform: uppercase; font-weight: 600; color: #1e293b;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">📍 Ulaanbaatar, Mongolia</div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">✦ International & Domestic Expeditions</div>
+          </div>
         </div>
 
-        <!-- Баруун талын өргөн хүрээтэй онцлох карт -->
         <div class="hero-right-card" onclick="openSongkranTour()">
           <div class="tour-tag" style="background: var(--accent); color: var(--surface-black);">Special 2027 Route</div>
             <h3 style="font-family: var(--font-display); font-size: 2.5rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
@@ -481,11 +492,24 @@
           </div>
         </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 1rem;">
+      <!-- Лаптоп дээр харагдах доод хэсэг -->
+      <div class="hero-desktop-footer" style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 1rem;">
         <div style="font-size: 0.875rem; text-transform: uppercase; color: #334155; font-weight: 600;">
           Explore Without Boundaries.
         </div>
         <div style="display: flex; gap: 2rem; font-size: 0.875rem; text-transform: uppercase; font-weight: 600;">
+          <a href="https://www.instagram.com/unbound.traverse" target="_blank" style="color: #090a0b; text-decoration: none;">Instagram</a>
+          <a href="https://www.facebook.com/share/19b9TnK36m/" target="_blank" style="color: #090a0b; text-decoration: none;">Facebook</a>
+          <a href="mailto:unbound.traverse@gmail.com" style="color: #090a0b; text-decoration: none;">Email</a>
+        </div>
+      </div>
+
+      <!-- Гар утсан дээр харагдах тусгай зайтай доод хэсэг -->
+      <div class="hero-footer-mobile">
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: #334155; font-weight: 600; text-align: center;">
+          Explore Without Boundaries.
+        </div>
+        <div style="display: flex; justify-content: center; gap: 1.5rem; font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">
           <a href="https://www.instagram.com/unbound.traverse" target="_blank" style="color: #090a0b; text-decoration: none;">Instagram</a>
           <a href="https://www.facebook.com/share/19b9TnK36m/" target="_blank" style="color: #090a0b; text-decoration: none;">Facebook</a>
           <a href="mailto:unbound.traverse@gmail.com" style="color: #090a0b; text-decoration: none;">Email</a>
@@ -509,10 +533,7 @@
         </p>
       </div>
 
-      <!-- Картууд болон үзүүлэлтүүдийн грид -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
-        
-        <!-- Карт 1 -->
         <div class="expedition-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
             <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Expeditions</span>
@@ -523,7 +544,6 @@
           <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Дотоод болон олон улсын бүс нутгуудад амжилттай зохион байгуулсан аяллууд.</p>
         </div>
 
-        <!-- Карт 2 -->
         <div class="expedition-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
             <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Travelers</span>
@@ -534,7 +554,6 @@
           <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Олон улсын болон дотоодын аялагчдад зориулсан мэргэжлийн хөтөч үйлчилгээ.</p>
         </div>
 
-        <!-- Карт 3 -->
         <div class="expedition-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
             <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Satisfaction</span>
@@ -544,7 +563,6 @@
           <p style="text-transform: uppercase; font-size: 0.875rem; color: var(--foreground-on-dark-muted); font-weight: 600; margin-bottom: 1rem;">Сэтгэл ханамжийн индекс</p>
           <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Хэрэглэгчдийн хүсэл сонирхолд 100% нийцүүлсэн тусгай маршрут төлөвлөлт.</p>
         </div>
-
       </div>
     </div>
 
@@ -561,8 +579,6 @@
   <!-- 1. ГАДААД АЯЛАЛ (International Expeditions) -->
   <section id="foreign-tours" style="background: var(--surface-black); color: var(--foreground-on-dark); min-height: 100lvh; padding: 6rem 2rem; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--border-on-dark);">
     <div style="max-width: 75rem; width: 100%; margin: 0 auto;">
-      
-      <!-- Гарчиг -->
       <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
         <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 600;">
           GLOBAL EXPEDITION SYSTEM
@@ -575,10 +591,7 @@
         </p>
       </div>
 
-      <!-- Гадаад аяллын картууд -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-        
-        <!-- Сонкраныг угтах онцгой аялал -->
         <div class="tour-card" onclick="openSongkranTour()" style="border-color: var(--accent);">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag" style="background: var(--accent); color: var(--surface-black);">Special 2027 Route</div>
@@ -604,7 +617,6 @@
           </div>
         </div>
 
-        <!-- Вьетнамын гайхамшгийг нээх 8 өдөр -->
         <div class="tour-card" onclick="openVietnamTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">International Route</div>
@@ -630,7 +642,6 @@
           </div>
         </div>
 
-        <!-- Бээжингээс Куньмин хүртэлх экспедиц -->
         <div class="tour-card" onclick="openChinaTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">International Route</div>
@@ -656,7 +667,6 @@
           </div>
         </div>
 
-        <!-- Эртний соёл, орчин үеийн амт, далайн эргийн романс -->
         <div class="tour-card" onclick="openThailandTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">International Route</div>
@@ -688,8 +698,6 @@
   <!-- 2. ДОТООД АЯЛАЛ (Domestic Expeditions: Говь, Уулс, Хөвсгөл нуур) -->
   <section id="domestic-tours" style="background: var(--surface-black); color: var(--foreground-on-dark); min-height: 100lvh; padding: 6rem 2rem; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--border-on-dark);">
     <div style="max-width: 75rem; width: 100%; margin: 0 auto;">
-      
-      <!-- Гарчиг -->
       <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
         <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 600;">
           MONGOLIAN STEPPE & ALPINE SYSTEMS
@@ -698,14 +706,11 @@
           Дотоод аялал.
         </h2>
         <p style="color: var(--foreground-on-dark-muted); max-width: 34rem; font-size: 1rem; text-transform: uppercase; line-height: 1.5;">
-          Монголын хязгааргүй говь, сүрлэг цаст уулс болон тайга хөвчийг холбосон дотоодын онцгой аялалын маршрутууд.
+          Монголын хязгааргүй говь, сүрлэг цаст уулс болон тайга хөвчийг холбосон дотоодын онцгой аялалын маршрутууд.
         </p>
       </div>
 
-      <!-- Дотоод аяллын картууд -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-        
-        <!-- Дотоод аялал 1: Говь -->
         <div class="tour-card" onclick="openGobiTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">Desert Expedition</div>
@@ -731,7 +736,6 @@
           </div>
         </div>
 
-        <!-- Дотоод аялал 2: Уулс -->
         <div class="tour-card" onclick="openAltaiTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">Alpine Expedition</div>
@@ -757,7 +761,6 @@
           </div>
         </div>
 
-        <!-- Дотоод аялал 3: Хөвсгөл нуур -->
         <div class="tour-card" onclick="openKhuvsgulTour()">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="tour-tag">Taiga Expedition</div>
@@ -782,17 +785,13 @@
             </button>
           </div>
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- Footer / Захиалга өгөх хэсэг -->
   <footer id="contact" style="background: #0b1310; color: #cbd5e1; padding: 5rem 2rem; position: relative; z-index: 20; border-top: 1px solid #1e2922;">
     <div style="max-width: 64rem; margin: 0 auto; text-align: center; display: flex; flex-direction: column; gap: 3rem;">
-      
-      <!-- Гарчиг хэсэг -->
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
         <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; color: var(--accent); font-weight: 600;">
           UNBOUND TRAVERSE MONGOLIA
@@ -803,10 +802,7 @@
         <p style="font-size: 0.875rem; color: #94a3b8; margin-top: 0.25rem;">unbound.traverse@gmail.com</p>
       </div>
 
-      <!-- 3 карт хэлбэрийн холбоосууд -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Instagram Карт -->
         <a href="https://www.instagram.com/unbound.traverse?mdxt=MXkwZmg2ZHhhMTVtaw==" target="_blank" rel="noopener noreferrer" class="footer-card">
           <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
             <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -819,7 +815,6 @@
           <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">DM-ээр холбогдох</p>
         </a>
 
-        <!-- Facebook Карт -->
         <a href="https://www.facebook.com/share/19b9TnK36m/" target="_blank" rel="noopener noreferrer" class="footer-card">
           <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
             <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -830,7 +825,6 @@
           <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Messenger-ээр чатлах</p>
         </a>
 
-        <!-- Утас Карт -->
         <a href="tel:60227005" class="footer-card">
           <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
             <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -840,20 +834,16 @@
           <h3 style="color: #ffffff; font-weight: 600; font-size: 1.125rem;">Утас</h3>
           <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">60227005 / 72528269</p>
         </a>
-
       </div>
 
-      <!-- Доод мэдээлэл -->
       <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.75rem; text-transform: uppercase; color: #64748b; gap: 1rem;">
         <p>© 2026 Unbound Traverse. All rights reserved.</p>
         <p>Explore Without Boundaries.</p>
       </div>
-
     </div>
   </footer>
 
   <script>
-    // Modal Control Functions
     function showModal(tag, title, price, duration, contentHtml) {
       document.getElementById('modal-tag').innerText = tag;
       document.getElementById('modal-title').innerText = title;
@@ -957,7 +947,6 @@
       document.getElementById('tour-modal').classList.remove('active');
     }
 
-    // Close modal when clicking outside the box
     window.addEventListener('click', (e) => {
       const modal = document.getElementById('tour-modal');
       if (e.target === modal) {
@@ -966,7 +955,7 @@
     });
   </script>
 
- <script type="module">
+  <script type="module">
     import Lenis from "lenis";
     import * as THREE from "three";
 
@@ -977,7 +966,6 @@
     }
     requestAnimationFrame(raf);
 
-    // Three.js Background Glowing Round Starfield Setup
     const canvas = document.getElementById("hero-canvas");
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -987,7 +975,6 @@
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 30;
 
-    // Create Round Glowing Particle Texture dynamically
     function getParticleTexture() {
       const canvasSize = 64;
       const canvas = document.createElement('canvas');
@@ -1006,11 +993,9 @@
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvasSize, canvasSize);
 
-      const texture = new THREE.CanvasTexture(canvas);
-      return texture;
+      return new THREE.CanvasTexture(canvas);
     }
 
-    // Create Starfield Particles
     const particleCount = 800;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -1046,7 +1031,6 @@
     const starfield = new THREE.Points(geometry, material);
     scene.add(starfield);
 
-    // Mouse movement reactivity
     let mouseX = 0;
     let mouseY = 0;
     window.addEventListener('mousemove', (e) => {
@@ -1054,25 +1038,20 @@
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
 
-    // Render loop for smooth cosmos rotation
     function animate(time) {
       requestAnimationFrame(animate);
-      
       starfield.rotation.y = time * 0.00015 + mouseX * 0.1;
       starfield.rotation.x = time * 0.0001 + mouseY * 0.1;
-
       renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
 
-    // Window Resize Handling
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Simulate Loading Veil Exit
     window.addEventListener("load", () => {
       const meter = document.getElementById("veil-meter");
       const veil = document.getElementById("loading-veil");

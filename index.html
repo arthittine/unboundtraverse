@@ -115,24 +115,29 @@
       max-width: 90rem;
       margin: 0 auto;
       width: 100%;
-      flex-wrap: wrap; /* Гар утсан дээр зай хүрэхгүй бол доошоо шилжих зориулалттай */
       gap: 1rem;
     }
 
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
     .nav-logo img {
-      height: 2rem; /* Утсан дээр логоны хэмжээг жаахан жижгэрүүлэв */
+      height: 2.2rem;
       width: auto;
       display: block;
     }
 
     .nav-links {
       display: flex;
-      gap: 1.5rem; /* Утсан дээр хоорондын зайг багасгав */
+      gap: 1.5rem;
       list-style: none;
       text-transform: uppercase;
-      font-size: 0.75rem; /* Фонтын хэмжээг жаахан жижгэрүүлэв */
+      font-size: 0.8rem;
       font-weight: 500;
-      flex-wrap: wrap;
+      white-space: nowrap; /* Үгс доошоо хуваагдаж унахгүй, нэг мөрөнд байх зориулалттай */
     }
 
     .nav-links a {
@@ -150,13 +155,14 @@
       text-decoration: none;
       font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       padding: 0.4rem 0.8rem;
       border: 1px solid var(--border-muted);
       border-radius: 0.5rem;
       transition: all 150ms ease;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(4px);
+      white-space: nowrap;
     }
 
     .booking-btn:hover {

@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unbound Traverse — Travel & Expedition Systems</title>
+  
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/",
+      "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --raw-color-ice-50: #f7fafb;
+      --raw-color-ice-100: #ebeef1;
+      --raw-color-ice-200: #dfe5e9;
+      --raw-color-steel-400: #b6c1c8;
+      --raw-color-ink-950: #090a0b;
+      --raw-color-ink-900: #0e0f14;
+      --raw-color-ink-800: #1b1d24;
+      --raw-color-ink-700: #2a2d36;
+      --raw-color-ink-alpha-35: rgb(9 10 11 / 0.35);
+      --raw-color-cyan-400: #02d2e3;
+      --raw-color-cyan-alpha-25: rgb(2 210 227 / 0.25);
+      --raw-color-stone-600: #535450;
+      --raw-color-white: #ffffff;
+
+      --background: var(--raw-color-ice-50);
+      --foreground: var(--raw-color-ink-950);
+      --foreground-muted: var(--raw-color-ink-alpha-35);
+      --surface-dark: var(--raw-color-ink-900);
+      --surface-dark-raised: var(--raw-color-ink-800);
+      --surface-black: var(--raw-color-ink-950);
+      --surface-muted: var(--raw-color-ice-100);
+      --surface-soft: var(--raw-color-ice-200);
+      --foreground-on-dark: var(--raw-color-white);
+      --foreground-on-dark-muted: var(--raw-color-steel-400);
+      --border-muted: var(--raw-color-ice-200);
+      --border-on-dark: var(--raw-color-ink-700);
+      --accent: var(--raw-color-cyan-400);
+      --accent-muted: var(--raw-color-cyan-alpha-25);
+
+      --font-sans: "Space Grotesk", system-ui, sans-serif;
+      --font-display: "Oswald", Impact, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font-family: var(--font-sans);
+      min-height: 100lvh;
+      overflow-x: hidden;
+    }
+
+    /* Loading Veil */
+    #loading-veil {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--background);
+      transition: opacity 0.7s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    section {
+      position: relative;
+      isolation: isolate;
+      min-height: 100lvh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* WebGL Background Canvas Layer */
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Header & Navigation Styling */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 30;
+      padding: 1.5rem 3rem;
+      max-width: 90rem;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--foreground);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 3rem;
+      list-style: none;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      color: var(--foreground);
+      text-decoration: none;
+      transition: color 150ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .booking-btn {
+      color: var(--foreground);
+      text-decoration: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-muted);
+      border-radius: 0.5rem;
+      transition: all 150ms ease;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    .booking-btn:hover {
+      background: var(--foreground);
+      color: var(--background);
+      border-color: var(--foreground);
+    }
+
+    /* Hero Section with Bright Floral Mountain Nature Background */
+    [data-hero] {
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.35) 40%, rgba(255, 255, 255, 0.15) 100%), 
+                  url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80') no-repeat center center/cover;
+    }
+
+    .hero-content {
+      min-height: calc(100lvh - 5rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem 3rem 2rem 3rem;
+      max-width: 90rem;
+      margin: 0 auto;
+      position: relative;
+      z-index: 20;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(3.5rem, 8vw, 6rem);
+      text-transform: uppercase;
+      line-height: 0.95;
+    }
+
+    /* Highlight Featured Card on Right - Доошлуулахын тулд margin-top нэмнэ */
+    .hero-right-card {
+      background: rgba(18, 28, 23, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(2, 210, 227, 0.4);
+      border-radius: 1.25rem;
+      padding: 3rem;
+      flex: 1;
+      min-width: 320px;
+      max-width: 45rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-top: 4rem; /* Энэ мөрийг нэмж өгснөөр карт доошилно */
+    }
+
+    .hero-right-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 30px 60px rgba(2, 210, 227, 0.3);
+    }
+
+    /* Expedition Cards Hover Effects */
+    .expedition-card {
+      background: var(--surface-dark-raised);
+      border: 1px solid var(--border-on-dark);
+      padding: 2.5rem 2rem;
+      border-radius: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .expedition-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(2, 210, 227, 0.1);
+    }
+
+    /* Upcoming Tours Card Styling */
+    .tour-card {
+      background: #121c17;
+      border: 1px solid #1e2922;
+      border-radius: 1rem;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .tour-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(2, 210, 227, 0.15);
+    }
+
+    .tour-tag {
+      background: rgba(2, 210, 227, 0.1);
+      color: var(--accent);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      width: max-content;
+    }
+
+    /* Footer Card Styling */
+    .footer-card {
+      background: #121c17;
+      border: 1px solid #1e2922;
+      border-radius: 1rem;
+      padding: 2rem 1.5rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .footer-card:hover {
+      border-color: rgba(2, 210, 227, 0.5);
+      transform: translateY(-4px);
+    }
+
+    /* Modal Styling */
+    #tour-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(9, 10, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #tour-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #121c17;
+      border: 1px solid var(--accent);
+      border-radius: 1.25rem;
+      max-width: 48rem;
+      width: 100%;
+      padding: 3rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: 0 25px 50px rgba(2, 210, 227, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--foreground-on-dark-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--accent);
+    }
+
+    .day-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--accent);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Veil -->
+  <div id="loading-veil" role="status" aria-label="Loading Unbound Traverse">
+    <div style="font-family: var(--font-display); font-size: 2rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; color: var(--foreground);">
+      Unbound Traverse
+    </div>
+    <div style="width: 200px; height: 4px; background: var(--border-muted); overflow: hidden; border-radius: 2px;">
+      <div id="veil-meter" style="width: 100%; height: 100%; background: var(--foreground); transform-origin: left; transform: scaleX(0); transition: transform 0.4s ease;"></div>
+    </div>
+  </div>
+
+  <!-- Detailed Info Modal -->
+  <div id="tour-modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-tag" class="tour-tag">Expedition Detail</div>
+      <h3 id="modal-title" style="font-family: var(--font-display); font-size: 2.5rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;"></h3>
+      <div id="modal-content" style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; color: #cbd5e1; max-height: 55vh; overflow-y: auto; padding-right: 0.5rem;">
+        <!-- Dynamic modal body injected here -->
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-on-dark); padding-top: 1.5rem; font-size: 0.875rem; text-transform: uppercase;">
+        <div>
+          <span style="color: var(--foreground-on-dark-muted);">Үндсэн үнэ:</span> <strong id="modal-price" style="color: var(--accent); font-size: 1.25rem;"></strong>
+        </div>
+        <div>
+          <span style="color: var(--foreground-on-dark-muted);">Хугацаа:</span> <strong id="modal-duration" style="color: #fff;"></strong>
+        </div>
+      </div>
+
+      <a href="#contact" onclick="closeModal()" style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; transition: opacity 0.2s;">
+        Энэ аялалд захиалга өгөх
+      </a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section data-hero>
+    <!-- WebGL Canvas Layer -->
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+
+    <header>
+      <a href="#" class="nav-logo">Unbound Traverse</a>
+      <ul class="nav-links">
+        <li><a href="#foreign-tours">Гадаад аялал</a></li>
+        <li><a href="#domestic-tours">Дотоод аялал</a></li>
+        <li><a href="#season">Season</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div>
+        <a href="#contact" class="booking-btn">[ Booking → ]</a>
+      </div>
+    </header>
+
+   <div class="hero-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 3rem; flex-wrap: wrap;">
+        <!-- Зүүн талын гарчиг болон мэдээлэл -->
+        <!-- Өөрчлөгдсөн HTML хэсэг -->
+        <div style="flex: 1; min-width: 280px; max-width: 38rem; margin-top: 4rem;">
+  <h1 style="margin-bottom: 1.5rem; color: #090a0b;">
+    Unbound<br>Traverse
+  </h1>
+  <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 1.125rem; text-transform: uppercase; font-weight: 600; color: #1e293b;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">📍 Ulaanbaatar, Mongolia</div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">✦ International & Domestic Expeditions</div>
+  </div>
+        </div>
+
+        <!-- Баруун талын өргөн хүрээтэй онцлох карт -->
+        <div class="hero-right-card" onclick="openSongkranTour()">
+          <div class="tour-tag" style="background: var(--accent); color: var(--surface-black);">Special 2027 Route</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.5rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+                Тайланд Сонкран фестиваль 2027
+            </h3>
+            <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6;">
+                Дэлхийн алдарт усны баяр Сонкран фестиваль болон Бангкок, Пүүкет арлын цогц аялалд урьж байна. Халуун орны наран шарлагын газар болон баярын уур амьсгалыг нэг дор мэдрээрэй.
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 1.25rem; font-size: 0.85rem; text-transform: uppercase;">
+                <span style="color: #94a3b8; font-weight: 600;">Огноо: 2027.04 сар</span>
+                <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem;">Хөтөлбөр үзэх →</span>
+            </div>
+          </div>
+        </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 1rem;">
+        <div style="font-size: 0.875rem; text-transform: uppercase; color: #334155; font-weight: 600;">
+          Explore Without Boundaries.
+        </div>
+        <div style="display: flex; gap: 2rem; font-size: 0.875rem; text-transform: uppercase; font-weight: 600;">
+          <a href="https://www.instagram.com/unbound.traverse" target="_blank" style="color: #090a0b; text-decoration: none;">Instagram</a>
+          <a href="https://www.facebook.com/share/19b9TnK36m/" target="_blank" style="color: #090a0b; text-decoration: none;">Facebook</a>
+          <a href="mailto:unbound.traverse@gmail.com" style="color: #090a0b; text-decoration: none;">Email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Season So Far (Expeditions блок) -->
+  <section id="season" style="background: var(--surface-black); color: var(--foreground-on-dark); min-height: 100lvh; padding: 6rem 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="max-width: 75rem; width: 100%; margin: 0 auto;">
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
+        <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 600;">
+          UNBOUND TRAVERSE MONGOLIA — SEASON 2026
+        </p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(3rem, 6vw, 4.5rem); text-transform: uppercase; line-height: 0.95;">
+          The season so far.
+        </h2>
+        <p style="color: var(--foreground-on-dark-muted); max-width: 32rem; font-size: 1rem; text-transform: uppercase; line-height: 1.5;">
+          Хязгааргүй замнал, алслагдсан бүс нутаг болон степийн экспедицүүдээр бүтээсэн амжилттай аяллын тоон үзүүлэлтүүд.
+        </p>
+      </div>
+
+      <!-- Картууд болон үзүүлэлтүүдийн грид -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+        
+        <!-- Карт 1 -->
+        <div class="expedition-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Expeditions</span>
+            <span style="font-size: 1.25rem;">🏔️</span>
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 3.5rem; color: var(--foreground-on-dark); margin-bottom: 0.5rem; line-height: 1;">12+</h3>
+          <p style="text-transform: uppercase; font-size: 0.875rem; color: var(--foreground-on-dark-muted); font-weight: 600; margin-bottom: 1rem;">Амжилттай экспедиц</p>
+          <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Дотоод болон олон улсын бүс нутгуудад амжилттай зохион байгуулсан аяллууд.</p>
+        </div>
+
+        <!-- Карт 2 -->
+        <div class="expedition-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Travelers</span>
+            <span style="font-size: 1.25rem;">🌍</span>
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 3.5rem; color: var(--foreground-on-dark); margin-bottom: 0.5rem; line-height: 1;">150+</h3>
+          <p style="text-transform: uppercase; font-size: 0.875rem; color: var(--foreground-on-dark-muted); font-weight: 600; margin-bottom: 1rem;">Хамрагдсан аялагчид</p>
+          <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Олон улсын болон дотоодын аялагчдад зориулсан мэргэжлийн хөтөч үйлчилгээ.</p>
+        </div>
+
+        <!-- Карт 3 -->
+        <div class="expedition-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; font-weight: 600;">Satisfaction</span>
+            <span style="font-size: 1.25rem;">✨</span>
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 3.5rem; color: var(--foreground-on-dark); margin-bottom: 0.5rem; line-height: 1;">100%</h3>
+          <p style="text-transform: uppercase; font-size: 0.875rem; color: var(--foreground-on-dark-muted); font-weight: 600; margin-bottom: 1rem;">Сэтгэл ханамжийн индекс</p>
+          <p style="font-size: 0.8125rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">Хэрэглэгчдийн хүсэл сонирхолд 100% нийцүүлсэн тусгай маршрут төлөвлөлт.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="max-width: 75rem; width: 100%; margin: 0 auto; padding-top: 4rem; border-top: 1px solid var(--border-on-dark); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <p style="text-transform: uppercase; font-size: 0.75rem; color: var(--foreground-on-dark-muted); letter-spacing: 0.1em;">
+        Explore International & Domestic Expeditions 2026/2027
+      </p>
+      <a href="#foreign-tours" style="color: var(--accent); text-decoration: none; font-size: 0.875rem; font-weight: 700; text-transform: uppercase;">
+        View Expeditions ↓
+      </a>
+    </div>
+  </section>
+
+  <!-- 1. ГАДААД АЯЛАЛ (International Expeditions) -->
+  <section id="foreign-tours" style="background: var(--surface-black); color: var(--foreground-on-dark); min-height: 100lvh; padding: 6rem 2rem; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--border-on-dark);">
+    <div style="max-width: 75rem; width: 100%; margin: 0 auto;">
+      
+      <!-- Гарчиг -->
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
+        <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 600;">
+          GLOBAL EXPEDITION SYSTEM
+        </p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(3rem, 6vw, 4.5rem); text-transform: uppercase; line-height: 0.95;">
+          Гадаад аялал.
+        </h2>
+        <p style="color: var(--foreground-on-dark-muted); max-width: 34rem; font-size: 1rem; text-transform: uppercase; line-height: 1.5;">
+          Монголоос эхтэй тив дэлхийн өргөн уудам уур хязгаараас халуун орны наран дор хөтлөх онцгой аяллын маршрутууд.
+        </p>
+      </div>
+
+      <!-- Гадаад аяллын картууд -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+        
+        <!-- Сонкраныг угтах онцгой аялал -->
+        <div class="tour-card" onclick="openSongkranTour()" style="border-color: var(--accent);">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag" style="background: var(--accent); color: var(--surface-black);">Special 2027 Route</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Бангкокийн гудамж, Пүкетийн далай: Сонкраныг угтах онцгой аялал
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Дэлхийн алдарт усны баяр Сонкран фестивалиар Бангкок, Патайя болон Пүкет аралд дурсамж дүүрэн аялах онцгой аялал.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2027.04 сар</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үндсэн үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮3'890'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+        <!-- Вьетнамын гайхамшгийг нээх 8 өдөр -->
+        <div class="tour-card" onclick="openVietnamTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">International Route</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Ханойгоос Сайгон хүртэл: Вьетнамын гайхамшгийг нээх 8 өдөр
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Ханой хотын түүхэн гудамж, байгалийн гайхамшигт Ха Лонг Бэй болон Сайгоны соёлыг судлах 8 өдрийн цогц аялал.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.10.12</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮3'200'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+        <!-- Бээжингээс Куньмин хүртэлх экспедиц -->
+        <div class="tour-card" onclick="openChinaTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">International Route</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Түүхийн ул мөр, байгалийн нууц: Бээжингээс Куньмин хүртэлх экспедиц
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Бээжингийн түүхийн дурсгалт газрууд, Цагаан хэрэм болон Куньмин хотын байгалийн үзэсгэлэнт тогтцоор аялах экспедиц.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.11.05</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮2'850'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+        <!-- Эртний соёл, орчин үеийн амт, далайн эргийн романс -->
+        <div class="tour-card" onclick="openThailandTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">International Route</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Дурсамж бүтээх ертөнц: Эртний соёл, орчин үеийн амт, далайн эргийн романс
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Бангкок хотын сүрлэг сүм хийдүүд, гудамжны амтат хоол болон далайн эргийн амралтыг хослуулсан аялал.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.12.01</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮3'500'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ДОТООД АЯЛАЛ (Domestic Expeditions: Говь, Уулс, Хөвсгөл нуур) -->
+  <section id="domestic-tours" style="background: var(--surface-black); color: var(--foreground-on-dark); min-height: 100lvh; padding: 6rem 2rem; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--border-on-dark);">
+    <div style="max-width: 75rem; width: 100%; margin: 0 auto;">
+      
+      <!-- Гарчиг -->
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 4rem;">
+        <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 600;">
+          MONGOLIAN STEPPE & ALPINE SYSTEMS
+        </p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(3rem, 6vw, 4.5rem); text-transform: uppercase; line-height: 0.95;">
+          Дотоод аялал.
+        </h2>
+        <p style="color: var(--foreground-on-dark-muted); max-width: 34rem; font-size: 1rem; text-transform: uppercase; line-height: 1.5;">
+          Монголын хязгааргүй говь, сүрлэг цаст уулс болон тайга хөвчийг холбосон дотоодын онцгой аялалын маршрутууд.
+        </p>
+      </div>
+
+      <!-- Дотоод аяллын картууд -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+        
+        <!-- Дотоод аялал 1: Говь -->
+        <div class="tour-card" onclick="openGobiTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">Desert Expedition</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Говийн улаан хад & Элсэн манхан
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Говийн гайхамшигт байгаль, түүхийн өлгий нутаг, мөн говийн зэрлэг байгалиар аялах бартаат замын тусгай экспедиц.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.08.10</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮1'850'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+        <!-- Дотоод аялал 2: Уулс -->
+        <div class="tour-card" onclick="openAltaiTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">Alpine Expedition</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Алтай Таван Богд & Цамхаг уулс
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Монголын баруун хязгаар дахь мөнх цаст уулс, мөсөн голууд болон казак үндэстний өв соёлоор аялах 7 хоногийн экспедиц.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.07.15</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮2'400'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+        <!-- Дотоод аялал 3: Хөвсгөл нуур -->
+        <div class="tour-card" onclick="openKhuvsgulTour()">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="tour-tag">Taiga Expedition</div>
+            <h3 style="font-family: var(--font-display); font-size: 2.25rem; text-transform: uppercase; color: #ffffff; line-height: 1.1;">
+              Хөвсгөл нуур & Тайгын экспедиц
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--foreground-on-dark-muted); line-height: 1.6;">
+              Хөх сувдан Хөвсгөл нуур болон тайга хөвчөөр аялж, цаатан ардын ахуй амьдралтай танилцах цогц аялал.
+            </p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border-on-dark); padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Огноо:</span>
+              <span style="font-weight: 600; color: #ffffff;">2026.09.05</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; text-transform: uppercase;">
+              <span style="color: var(--foreground-on-dark-muted);">Үнэ:</span>
+              <span style="font-weight: 600; color: var(--accent);">₮1'950'000</span>
+            </div>
+            <button style="display: block; width: 100%; text-align: center; background: var(--accent); color: var(--surface-black); padding: 0.85rem; border-radius: 0.5rem; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.875rem; cursor: pointer;">
+              Дэлгэрэнгүй үзэх
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer / Захиалга өгөх хэсэг -->
+  <footer id="contact" style="background: #0b1310; color: #cbd5e1; padding: 5rem 2rem; position: relative; z-index: 20; border-top: 1px solid #1e2922;">
+    <div style="max-width: 64rem; margin: 0 auto; text-align: center; display: flex; flex-direction: column; gap: 3rem;">
+      
+      <!-- Гарчиг хэсэг -->
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <p style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; color: var(--accent); font-weight: 600;">
+          UNBOUND TRAVERSE MONGOLIA
+        </p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 3.5rem); text-transform: uppercase; color: #ffffff;">
+          Захиалга өгөх
+        </h2>
+        <p style="font-size: 0.875rem; color: #94a3b8; margin-top: 0.25rem;">unbound.traverse@gmail.com</p>
+      </div>
+
+      <!-- 3 карт хэлбэрийн холбоосууд -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Instagram Карт -->
+        <a href="https://www.instagram.com/unbound.traverse?mdxt=MXkwZmg2ZHhhMTVtaw==" target="_blank" rel="noopener noreferrer" class="footer-card">
+          <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+            <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+            </svg>
+          </div>
+          <h3 style="color: #ffffff; font-weight: 600; font-size: 1.125rem;">Instagram</h3>
+          <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">DM-ээр холбогдох</p>
+        </a>
+
+        <!-- Facebook Карт -->
+        <a href="https://www.facebook.com/share/19b9TnK36m/" target="_blank" rel="noopener noreferrer" class="footer-card">
+          <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+            <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </div>
+          <h3 style="color: #ffffff; font-weight: 600; font-size: 1.125rem;">Facebook</h3>
+          <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Messenger-ээр чатлах</p>
+        </a>
+
+        <!-- Утас Карт -->
+        <a href="tel:60227005" class="footer-card">
+          <div style="width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(2, 210, 227, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+            <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <h3 style="color: #ffffff; font-weight: 600; font-size: 1.125rem;">Утас</h3>
+          <p style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">60227005 / 72528269</p>
+        </a>
+
+      </div>
+
+      <!-- Доод мэдээлэл -->
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.75rem; text-transform: uppercase; color: #64748b; gap: 1rem;">
+        <p>© 2026 Unbound Traverse. All rights reserved.</p>
+        <p>Explore Without Boundaries.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    // Modal Control Functions
+    function showModal(tag, title, price, duration, contentHtml) {
+      document.getElementById('modal-tag').innerText = tag;
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-price').innerText = price;
+      document.getElementById('modal-duration').innerText = duration;
+      document.getElementById('modal-content').innerHTML = contentHtml;
+      document.getElementById('tour-modal').classList.add('active');
+    }
+
+    function openSongkranTour() {
+      showModal('Special 2027 Route', 'Тайланд Сонкран фестиваль 2027', "₮3'890'000", '8 Өдөр / 7 Шөнө', `
+        <p><strong>Огноо:</strong> 2027.04 сар (Сонкран баярын өдрүүдэд)</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-2-р өдөр: Улаанбаатар - Бангкок</strong><br>Бангкок хотод газардан зочид буудалдаа байрласны дараа хотын төвөөр аялах.</div>
+        <div class="day-box"><strong>3-4-р өдөр: Сонкран фестиваль (Усны баяр)</strong><br>Дэлхийн алдарт Сонкран фестивальд оролцож, гудамжны баяр ёслол, уламжлалт арга хэмжээнүүдэд нэгдэх.</div>
+        <div class="day-box"><strong>5-7-р өдөр: Пүүкет арал & Наран шарлагын газар</strong><br>Пүүкет арал руу нисэж цагаан элсэн эрэг, далайн аялал болон халуун орны амралтыг өнгөрүүлэх.</div>
+        <div class="day-box"><strong>8-р өдөр: Бангкок - Улаанбаатар</strong><br>Чөлөөт цаг, шоппинг хийгээд Улаанбаатар руу буцах нислэг.</div>
+      `);
+    }
+
+    function openHainansTour() {
+      showModal('Featured Island Expedition', 'Хайнань — 9-р сарын сүүлийн аялал', "₮2'590'000", '8 Өдөр / 7 Шөнө', `
+        <p><strong>Огноо:</strong> 09/29 - 10/06 (Тогтмол аялал — 7 хоног бүрийн Мягмар гарагт)</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-р өдөр: Улаанбаатар - Хайкоу шууд нислэг</strong><br>Чингис Хаан Олон Улсын нисэх онгоцны буудлаас 22:10 цагт нисэж, Хайкоу хотод шөнийн 03:10 цагт газардан Hampton Hotel буудалд амарна.</div>
+        <div class="day-box"><strong>2-р өдөр: Хайкоу - Саняа /Шилэн гүүр/</strong><br>Саняа хот руу явах замдаа Байшилин шилэн гүүр үзэж, Саняа хотын Timton Fuhe Hotel-д бууна.</div>
+        <div class="day-box"><strong>3-р өдөр: Чөлөөт өдөр</strong><br>Далайн эрэгт биеэ шаран, бассейнд цагийг хөгжилтэй өнгөрүүлэх болон shopping хийх боломжтой.</div>
+        <div class="day-box"><strong>4-р өдөр: Задгай далайн аялал</strong><br>Сувдны дэлгүүр орж, 3 цагийн турш задгай далай дээр экстрем тоглоомоор тоглож хөгжилдөнө.</div>
+        <div class="day-box"><strong>5-р өдөр: Атлантис усан парк</strong><br>Азид 2-т орох аварга том Атлантис усан паркт бүтэн өдрийг өнгөрүүлнэ.</div>
+        <div class="day-box"><strong>6 & 7-р өдөр: Чөлөөт өдрүүд</strong><br>Далайн эрэг, чөлөөт амралт, худалдаа үйлчилгээ.</div>
+        <div class="day-box"><strong>8-р өдөр: Саняа - Хайкоу - Улаанбаатар /Сармагчингийн арал/</strong><br>Замдаа Nanwan Monkey Island үзэж, шоппинг хийгээд Улаанбаатар руу буцах нислэг.</div>
+      `);
+    }
+
+    function openVietnamTour() {
+      showModal('International Route', 'Монгол — Вьетнам — Монгол', "₮3'200'000", '8 Өдөр / 7 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.10.12</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-р өдөр: Улаанбаатар - Ханой</strong><br>Улаанбаатараас нисэж Вьетнам улсын нийслэл Ханой хотод газардах. Зочид буудалдаа байрлах.</div>
+        <div class="day-box"><strong>2-р өдөр: Ханой хотын тойрон аялал</strong><br>Түүхийн дурсгалт газрууд, Хо Ши Миний бунхан, эртний сүм хийдүүдээр зочлох.</div>
+        <div class="day-box"><strong>3-4-р өдөр: Ха Лонг Бэй (Ha Long Bay)</strong><br>Дэлхийн байгалийн гайхамшигт тооцогдох далайн шохойн чулуун хаднууд дундуур усан онгоцоор аялж хоноглох.</div>
+        <div class="day-box"><strong>5-6-р өдөр: Данан & Хой Ан хот</strong><br>Алдарт "Алтан гүүр" (Golden Bridge)-ээр зочилж, эртний жуулчны хот Хой Аны шөнийн гэрэлт гудамжаар зугаалах.</div>
+        <div class="day-box"><strong>7-8-р өдөр: Сайгон (Хо Ши Мин) - Улаанбаатар</strong><br>Өмнөд Вьетнамын төвөөр аялан шоппинг хийж, Улаанбаатар руу буцах нислэгээр ирэх.</div>
+      `);
+    }
+
+    function openChinaTour() {
+      showModal('International Route', 'Монгол — Хятад — Монгол', "₮2'850'000", '7 Өдөр / 6 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.11.05</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-2-р өдөр: Улаанбаатар - Бээжин</strong><br>Бээжин хотод ирж Хориотой хот, Тяньаньминий талбай болон Цагаан хэрэмтэй танилцах.</div>
+        <div class="day-box"><strong>3-4-р өдөр: Өндөр хурдны галт тэрэг & Куньмин</strong><br>Хятадын орчин үеийн галт тэргээр аялж өмнөд зүгийн үзэсгэлэнт Куньмин хотод ирэх.</div>
+        <div class="day-box"><strong>5-6-р өдөр: Чулуун ойн парк & Байгалийн үзэсгэлэн</strong><br>Юннань мужийн алдарт Чулуун ойн парк (Stone Forest) болон үндэсний соёлын хүрээлэнгээр зочлох.</div>
+        <div class="day-box"><strong>7-р өдөр: Куньмин - Бээжин - Улаанбаатар</strong><br>Бээжингийн нисэх буудлаас дамжин Улаанбаатар хотод ирж аялал өндөрлөнө.</div>
+      `);
+    }
+
+    function openThailandTour() {
+      showModal('International Route', 'Монгол — Тайланд — Монгол', "₮3'500'000", '8 Өдөр / 7 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.12.01</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-2-р өдөр: Улаанбаатар - Бангкок</strong><br>Бангкок хотод бууж аяллын угталт авч, Гранд Палас болон суут сүм хийдүүдээр зочлох.</div>
+        <div class="day-box"><strong>3-4-р өдөр: Шөнийн зах & Гудамжны амтат хоолны аялал</strong><br>Бангкокийн алдартай шөнийн зах, уламжлалт массаж болон худалдааны төвүүдээр хэсэх.</div>
+        <div class="day-box"><strong>5-7-р өдөр: Пүүкет арал (Phuket Island)</strong><br>Халуун орны цагаан элсэн эрэг, оюу ногоон далай бүхий Пүүкет арал дээр бүтэн амралт, далайн спортоор хичээллэх.</div>
+        <div class="day-box"><strong>8-р өдөр: Бангкок - Улаанбаатар</strong><br>Бангкокоос шууд нислэгээр эх орондоо ирэх.</div>
+      `);
+    }
+
+    function openGobiTour() {
+      showModal('Desert Expedition', 'Говийн улаан хад & Элсэн манхан', "₮1'850'000", '5 Өдөр / 4 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.08.10</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-р өдөр: Улаанбаатар - Баянзаг</strong><br>Говийн зүг хөдөлж, эртний үлэг гүрвэлийн олдворт Баянзагийн Улаан хаданд нар жаргахыг үзэх.</div>
+        <div class="day-box"><strong>2-3-р өдөр: Хонгорын элсэн манхан</strong><br>Дуутын манхан гэгдэх Хонгорын говьд хүрч, нутгийн малчин айлаар зочлон тэмээтэй аялал хийх.</div>
+        <div class="day-box"><strong>4-р өдөр: Ёлын ам хавцал</strong><br>Гурван Сайхан уулын байгалийн цогцолборт газар багтах Ёлын амны мөстэй хавцлаар алхах.</div>
+        <div class="day-box"><strong>5-р өдөр: Улаанбаатар руу буцах</strong><br>Говийн засмал болон шороон замаар аялсаар Улаанбаатар хотод ирж аялал өндөрлөнө.</div>
+      `);
+    }
+
+    function openAltaiTour() {
+      showModal('Alpine Expedition', 'Алтай Таван Богд & Цамхаг уулс', "₮2'400'000", '7 Өдөр / 6 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.07.15</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-2-р өдөр: Улаанбаатар - Өлгий хот</strong><br>Баруун аймгийн төв Өлгий хотод хүрч, казак үндэстний соёл, ёс заантай танилцах.</div>
+        <div class="day-box"><strong>3-5-р өдөр: Цагаан гол & Потанины мөсөн гол</strong><br>Морин аялал болон явган аялал хийж Алтай Таван Богд уулын оргилууд болон Потанины мөсөн гол дээр гарах.</div>
+        <div class="day-box"><strong>6-7-р өдөр: Бүргэдчин айл - Улаанбаатар</strong><br>Уламжлалт бүргэдчин айлаар зочилж шувуу сонирхоод Улаанбаатар руу буцах нислэг.</div>
+      `);
+    }
+
+    function openKhuvsgulTour() {
+      showModal('Taiga Expedition', 'Хөвсгөл нуур & Тайгын экспедиц', "₮1'950'000", '6 Өдөр / 5 Шөнө', `
+        <p><strong>Гарах огноо:</strong> 2026.09.05</p>
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 0.5rem 0;">
+        <div class="day-box"><strong>1-2-р өдөр: Улаанбаатар - Хөвсгөл нуур (Хатгал)</strong><br>Хөх сувд Хөвсгөл нутгийн зүг явж, нуурын эрэг дээр баазад байрлах.</div>
+        <div class="day-box"><strong>3-4-р өдөр: Тайга хөвч рүү аялах & Цаатан айл</strong><br>Тайга руу тусгай зориулалтын автомашинаар аялж, цаатан малчин ардын ахуй амьдралтай танилцах.</div>
+        <div class="day-box"><strong>5-6-р өдөр: Нуурын эрэг дээрх амралт - Улаанбаатар</strong><br>Нуурын эрэгт амарч загасчлах, завиар аялаад Улаанбаатар руу буцах.</div>
+      `);
+    }
+
+    function closeModal() {
+      document.getElementById('tour-modal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside the box
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('tour-modal');
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  </script>
+
+  <script type="module">
+    import Lenis from "lenis";
+    import * as THREE from "three";
+
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({ smoothWheel: true });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Three.js Background Visual Setup (Interactive Ambient Particles & Grid)
+    const canvas = document.getElementById("hero-canvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 30;
+
+    // Create interactive floating particle grid representing expedition nodes
+    const particleCount = 400;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 60;
+      positions[i + 1] = (Math.random() - 0.5) * 60;
+      positions[i + 2] = (Math.random() - 0.5) * 30;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({
+      color: 0x02d2e3,
+      size: 0.7,
+      transparent: true,
+      opacity: 0.6
+    });
+
+    const particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+
+    // Mouse movement reactivity
+    let mouseX = 0;
+    let mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 5;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 5;
+    });
+
+    // Render loop
+    function animate(time) {
+      requestAnimationFrame(animate);
+      particleSystem.rotation.y = time * 0.0003 + mouseX * 0.05;
+      particleSystem.rotation.x = time * 0.0002 + mouseY * 0.05;
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    // Window Resize Handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Simulate Loading Veil Exit
+    window.addEventListener("load", () => {
+      const meter = document.getElementById("veil-meter");
+      const veil = document.getElementById("loading-veil");
+      if (meter && veil) {
+        meter.style.transform = "scaleX(1)";
+        setTimeout(() => {
+          veil.style.opacity = "0";
+          setTimeout(() => veil.remove(), 700);
+        }, 500);
+      }
+    });
+  </script>
+</body>
+</html>

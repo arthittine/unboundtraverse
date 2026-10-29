@@ -104,26 +104,17 @@
       pointer-events: none;
     }
 
-   /* Header & Navigation Styling */
+  /* Header & Navigation Default (Компьютер / Лаптоп дээр харагдах хэлбэр) */
     header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      position: relative;
-      z-index: 30;
-      padding: 1.2rem 1rem;
-      max-width: 90rem;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
+      z-index: 30;
+      padding: 1.5rem 3rem;
+      max-width: 90rem;
+      margin: 0 auto;
       width: 100%;
-      max-width: 75rem;
     }
 
     .nav-logo {
@@ -133,34 +124,24 @@
     }
 
     .nav-logo img {
-      height: 2.2rem;
+      height: 2.5rem;
       width: auto;
       display: block;
     }
 
-    /* Гадаад, дотоод аялал, season, contact нэг мөрөнд байх хэсэг */
     .nav-links {
       display: flex;
-      gap: 1.2rem;
+      gap: 3rem;
       list-style: none;
       text-transform: uppercase;
-      font-size: 0.75rem;
-      font-weight: 600;
-      overflow-x: auto;
-      white-space: nowrap;
-      padding: 0.2rem 0;
-      width: 100%;
-      justify-content: center;
-    }
-
-    .nav-links::-webkit-scrollbar {
-      display: none; /* Scrollbar-ийг нуух */
+      font-size: 0.875rem;
+      font-weight: 500;
     }
 
     .nav-links a {
       color: var(--foreground);
       text-decoration: none;
-      transition: color 150ms ease;
+      transition: color 150ms cubic-bezier(0.2, 0, 0, 1);
     }
 
     .nav-links a:hover {
@@ -172,20 +153,57 @@
       text-decoration: none;
       font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.75rem;
-      padding: 0.4rem 1rem;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
       border: 1px solid var(--border-muted);
       border-radius: 0.5rem;
       transition: all 150ms ease;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(4px);
-      white-space: nowrap;
     }
 
     .booking-btn:hover {
       background: var(--foreground);
       color: var(--background);
       border-color: var(--foreground);
+    }
+
+    /* 📱 ГАР УТАС ДЭЭР ХАРАГДАХ ТУСГАЙ ТОХИРГОО (Дэлгэцийн өргөн 768px-ээс бага үед) */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.2rem 1rem;
+      }
+
+      .header-mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .nav-logo img {
+        height: 2.1rem;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1.2rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        justify-content: center;
+        padding: 0.2rem 0;
+      }
+
+      .booking-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+      }
     }
 
     /* Hero Section with Bright Floral Mountain Nature Background */
@@ -416,18 +434,23 @@
     <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
     <header>
-      <a href="#" class="nav-logo">Unbound Traverse</a>
+      <!-- Компьютер дээр хэвийн харагдах хэсэг (Утсан дээр автоматаар бүтцээрээ зохицно) -->
+      <a href="#" class="nav-logo">
+        <img src="logo.png" alt="Unbound Traverse Logo">
+      </a>
+      
       <ul class="nav-links">
         <li><a href="#foreign-tours">Гадаад аялал</a></li>
         <li><a href="#domestic-tours">Дотоод аялал</a></li>
         <li><a href="#season">Season</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
+
       <div>
         <a href="#contact" class="booking-btn">[ Booking → ]</a>
       </div>
     </header>
-
+    
    <div class="hero-content">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 3rem; flex-wrap: wrap;">
         <!-- Зүүн талын гарчиг болон мэдээлэл -->

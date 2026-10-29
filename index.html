@@ -111,29 +111,28 @@
       justify-content: space-between;
       position: relative;
       z-index: 30;
-      padding: 1.5rem 3rem;
+      padding: 1.5rem 2rem;
       max-width: 90rem;
       margin: 0 auto;
       width: 100%;
+      flex-wrap: wrap; /* Гар утсан дээр зай хүрэхгүй бол доошоо шилжих зориулалттай */
+      gap: 1rem;
     }
 
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--foreground);
-      text-decoration: none;
+    .nav-logo img {
+      height: 2rem; /* Утсан дээр логоны хэмжээг жаахан жижгэрүүлэв */
+      width: auto;
+      display: block;
     }
 
     .nav-links {
       display: flex;
-      gap: 3rem;
+      gap: 1.5rem; /* Утсан дээр хоорондын зайг багасгав */
       list-style: none;
       text-transform: uppercase;
-      font-size: 0.875rem;
+      font-size: 0.75rem; /* Фонтын хэмжээг жаахан жижгэрүүлэв */
       font-weight: 500;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
@@ -151,8 +150,8 @@
       text-decoration: none;
       font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.875rem;
-      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
       border: 1px solid var(--border-muted);
       border-radius: 0.5rem;
       transition: all 150ms ease;

@@ -978,34 +978,61 @@
     }
     requestAnimationFrame(raf);
 
-    // Three.js Background Visual Setup (Interactive Ambient Particles & Grid)
-    const canvas = document.getElementById("hero-canvas");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 30;
-
-    // Create interactive floating particle grid representing expedition nodes
-    const particleCount = 400;
+    // Create Fluid Wave Particle Grid
+    const rows = 40;
+    const cols = 50;
+    const particleCount = rows * cols;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
 
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 60;
-      positions[i + 1] = (Math.random() - 0.5) * 60;
-      positions[i + 2] = (Math.random() - 0.5) * 30;
+    const colorCyan = new THREE.Color(0x02d2e3);
+    const colorWhite = new THREE.Color(0xffffff);
+
+    let index = 0;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        const x = (j - cols / 2) * 1.2;
+        const z = (i - rows / 2) * 1.2;
+        const y = 0;
+
+        positions[index * 3] = x;
+        positions[index * 3 + 1] = y;
+        positions[index * 3 + 2] = z;
+
+        const mixColor = Math.random() > 0.3 ? colorCyan : colorWhite;
+        colors[index * 3] = mixColor.r;
+        colors[index * 3 + 1] = mixColor.g;
+        colors[index * 3 + 2] = mixColor.b;
+
+        index++;
+      }
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({
-      color: 0x02d2e3,
-      size: 0.7,
-      transparent: true,
-      opacity: 0.6
-    });
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Render loop with Sine wave motion (Давалгааны хөдөлгөөн оруулах хэсэг)
+    function animate(time) {
+      requestAnimationFrame(animate);
+      const t = time * 0.002;
+
+      const positionAttribute = geometry.attributes.position;
+      let idx = 0;
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const x = (j - cols / 2) * 1.2;
+          const z = (i - rows / 2) * 1.2;
+          // Sine болон Cosine ашиглан зөөлөн долгион үүсгэх томьёо
+          const y = Math.sin(x * 0.3 + t) * Math.cos(z * 0.3 + t) * 2.5;
+
+          positionAttribute.setY(idx, y);
+          idx++;
+        }
+      }
+      positionAttribute.needsUpdate = true;
+      // ...
+    }
 
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
